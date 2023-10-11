@@ -1,0 +1,93 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot
+
+"""Definición de fuentes"""
+alquiler_pisos_municipios_dataset = "W:/document/Programación Python/Parte 1/Tema 2/alquiler-madrid-municipios.csv"
+alquiler_pisos_distrito_dataset = "W:/document/Programación Python/Parte 1/Tema 2/alquiler-madrid-distritos.csv"
+
+alquiler_municipios= pd.read_csv(alquiler_pisos_municipios_dataset, sep=",", index_col=False)
+alquiler_distrito= pd.read_csv(alquiler_pisos_distrito_dataset, sep=",", index_col=False)
+
+###########
+"""
+* Imprime el número de filas y columnas
+* Examina las primeras y últimas filas"""
+
+
+alquiler_municipios.describe()
+alquiler_municipios.shape
+alquiler_municipios.head()
+alquiler_municipios.tail()
+
+
+##################
+"""
+Con el dataframe `alquiler_municipios`:
+
+* Muestra las primeras 10 filas usando `iloc`
+* Muestra las últimas 15 filas usando `iloc`"""
+###########
+
+alquiler_municipios.iloc[1:11]#primeras 10 filas
+alquiler_municipios.iloc[-16:]
+
+
+#################
+#seleccionar index
+alquiler_municipios = alquiler_municipios.set_index(['municipio'], drop=False)
+
+###############Muestra todos los datos disponibles del municipio de Colmenar Viejo
+#########
+
+alquiler_municipios.dtypes
+alquiler_municipios.loc['Colmenar Viejo']
+
+alquiler_municipios[(alquiler_municipios.municipio == 'Torrelodones') & (alquiler_municipios.anyo == 2012)]
+
+alquiler_municipios[(alquiler_municipios.precio > 13)]
+alquiler_municipios[(alquiler_municipios.precio > 13)].drop_duplicates()
+
+"""Extrae los datos de los municipios cuyo precio por metro cuadrado fue inferior a 10€ entre los años 2007 y 2010, ambos inclusive"""
+
+alquiler_municipios[(alquiler_municipios.precio < 10) & (alquiler_municipios.anyo >= 2007) & (alquiler_municipios.anyo <= 2010)]
+
+
+"""Extrae de mayor a menor por precio las filas de la tabla para el municipio de Valdemoro a partir del año 2015."""
+
+alquiler_municipios[alquiler_municipios.anyo > 2015].loc['Valdemoro'].sort_values(['precio'],ascending=False)
+
+######################################################
+#############analisis  estadistico
+
+Estats = describes(alquiler_municipios)
+
+#######agrupaciones
+alquiler_municipios.groupby('anyo').max()
+
+#sobre una columna
+alquiler_municipios.groupby('anyo').precio.min()
+
+tmp = alquiler_municipios.groupby('anyo').agg({'precio':'mean', 'municipio':'first'})
+tmp
+
+#############
+#Unir dos  dataframe
+
+alquiler_distrito['distrito']
+
+df_ejemplo = pd.DataFrame({'distrito':  ['Moratalaz', 'Centro', 'Barajas'],
+                           'poblacion': [95000, 150000, 46000]})
+df_ejemplo
+
+tmp = df_ejemplo.merge(alquiler_distrito, on='distrito', how='inner')  #Sería lo mismo hacer: df_ejemplo.merge(alquiler, on='distrito') #solos slos  distritos q
+tmp.head()
+
+tmp_right = df_ejemplo.merge(alquiler_distrito, on='distrito', how='right')  #Sería lo mismo hacer: df_ejemplo.merge(alquiler, on='distrito') #solos slos  distritos q
+tmp_right.head()
+
+#########################
+####visualización
+
+out = tmp_right.plot(subplots=True)
+
